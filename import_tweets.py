@@ -7,30 +7,30 @@ from IPython.display import display
 from datetime import datetime
 startTime = datetime.now()
 
-# Function to extract tweets
+# Fonction pour obtenir les tweets les plus recent concernant la requete "query"
 def get_tweets(query, max_tweets):
-    _max_queries = 1000  # arbitrarily chosen value
+    _max_queries = 1000  # valeur arbitraire
     auth = tweepy.OAuthHandler('lddW5cut4polesn9vmcjYiASi', 'RTSgn1qwwQii2ZOIZqrwtEyUu5qads6C5d0qXK4qVBAYX0nw1M')
     auth.set_access_token("1082883910978191360-gQO0MD6wtOIasaZpDdGLKc6dUEwLyf", "pBJ26U2xhtFqMs9KhSwYUAapH3KQfOr7CcsMfIOvNIdpC")
 
-    # Calling api
+    # Appel de l'API
     api = tweepy.API(auth, wait_on_rate_limit=True)
 
     tweets = tweet_batch = api.search(q=query,
-                        # geocode='1.3552217,103.8231561,100km',
-                        lang='fr',
-                        count=max_tweets,
-                        tweet_mode = "extended")
+                                      lang='fr',
+                                      count=max_tweets,
+                                      tweet_mode="extended")
 
     oldest = tweets[-1].id - 1
     print(oldest)
     ct = 1
+
     while len(tweets) < max_tweets and ct < _max_queries:
         print(len(tweets))
         tweet_batch = api.search(q=query,
                                  lang='fr',
                                  count=max_tweets - len(tweets),
-                                 tweet_mode = "extended",
+                                 tweet_mode="extended",
                                  max_id=oldest)
         tweets.extend(tweet_batch)
         oldest = tweets[-1].id - 1
@@ -39,9 +39,9 @@ def get_tweets(query, max_tweets):
         print(tweets.max_id)
 
         pd.set_option('display.max_colwidth', -1)
-        # We create a pandas dataframe as follows:
+        # On creee un dataframe pandas :
         data = pd.DataFrame(data=[tweet.full_text for tweet in tweets], columns=['Tweets'])
-        # We add relevant data:
+        # On ajoute les donnees d'interet
         data['len'] = np.array([len(tweet.full_text) for tweet in tweets])
         data['ID'] = np.array([tweet.id for tweet in tweets])
         data['Date'] = np.array([tweet.created_at for tweet in tweets])
